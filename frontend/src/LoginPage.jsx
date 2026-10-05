@@ -44,7 +44,11 @@ function LoginPage() {
         <p className="intro">Sign in with Google to save your links and see them across devices.</p>
         <div className="login-card">
           {googleClientId
-            ? <GoogleLogin onSuccess={handleCredential} onError={() => setError('Google sign-in was cancelled or could not be completed.')} />
+            ? <GoogleLogin
+              use_fedcm_for_button
+              onSuccess={handleCredential}
+              onError={() => setError('Google sign-in was cancelled or could not be completed.')}
+            />
             : <p className="form-error" role="alert">
               Google sign-in needs setup. Add <code>VITE_GOOGLE_CLIENT_ID</code> to the frontend environment and <code>GOOGLE_CLIENT_ID</code> to the backend environment.
             </p>}
