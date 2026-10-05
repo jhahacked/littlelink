@@ -38,10 +38,14 @@ export default async function proxyApi(request, response) {
     }
 
     const method = request.method || 'GET'
+    const incomingUrl = new URL(request.url, 'http://localhost')
+    const backendPath = incomingUrl.pathname.startsWith('/api/short/')
+      ? incomingUrl.pathname.slice('/api/short'.length)
+      : incomingUrl.pathname
     const body = method === 'GET' || method === 'HEAD'
       ? undefined
       : await readRequestBody(request)
-    const upstream = await fetch(new URL(request.url, backendUrl), {
+    const upstream = await fetch(new URL(`${backendPath}${incomingUrl.search}`, backendUrl), {
       method,
       headers,
       body,

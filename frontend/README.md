@@ -18,6 +18,24 @@ Full-stack URL shortener: React, Vite, Tailwind CSS, Express, and MongoDB.
 
 4. Run `npm run dev` in both `backend/` and `frontend/`.
 
+## Deploy on Render + MongoDB Atlas
+
+1. Push this project to GitHub and create a Render Blueprint from the
+   repository. It builds the frontend and backend into one `littlelink-api`
+   web service, keeping sign-in and session cookies on the same origin. Set
+   `MONGO_URI` to a MongoDB Atlas connection string, and set both
+   `GOOGLE_CLIENT_ID` and `VITE_GOOGLE_CLIENT_ID` to the same Google OAuth
+   client ID. Set `FRONTEND_ORIGINS` to the exact service origin shown by
+   Render, with no trailing slash. Render generates `JWT_SECRET`.
+2. In Google Cloud Console, add that exact Render service origin to the OAuth
+   client's authorized JavaScript origins. Test sign-in, create a link, open
+   its short URL, and verify `<RENDER_SERVICE_URL>/api/health` reports a
+   connected database.
+
+Allow the Render service to reach Atlas in its Network Access settings and use
+a database user with only the permissions this app needs. Keep `.env` files
+and secrets out of GitHub and LinkedIn.
+
 ## Deploy a demo (Vercel + Render + MongoDB Atlas)
 
 1. Push this project to a GitHub repository. In Render, create a Blueprint
@@ -30,10 +48,11 @@ Full-stack URL shortener: React, Vite, Tailwind CSS, Express, and MongoDB.
    `frontend`. Add these project environment variables:
    - `BACKEND_URL`: Render service URL, e.g. `https://littlelink-api.onrender.com`
    - `VITE_GOOGLE_CLIENT_ID`: the same Google client ID
-   - `VITE_SHORT_URL_BASE`: the Render service URL, without a trailing slash
    Leave `VITE_API_BASE_URL` unset: the Vercel function at `frontend/api/`
    proxies `/api` on the same origin, allowing the HttpOnly session cookie to
-   work without third-party-cookie blocking.
+   work without third-party-cookie blocking. Leave `VITE_SHORT_URL_BASE`
+   unset too: generated short links use the public Vercel origin and are
+   redirected through the same backend proxy.
 3. In Google Cloud Console, add the exact Vercel site origin to the OAuth
    client's authorized JavaScript origins. Keep `http://localhost:5173` too
    if you still want local sign-in.

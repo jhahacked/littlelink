@@ -1,4 +1,9 @@
-const SHORT_URL_BASE = import.meta.env.VITE_SHORT_URL_BASE || 'http://localhost:5000'
+const configuredShortUrlBase = import.meta.env.VITE_SHORT_URL_BASE
+const SHORT_URL_BASE = import.meta.env.PROD
+  ? configuredShortUrlBase && !configuredShortUrlBase.includes('localhost')
+    ? configuredShortUrlBase
+    : window.location.origin
+  : configuredShortUrlBase || 'http://localhost:5000'
 
 export function buildShortUrl(shortId) {
   return `${SHORT_URL_BASE.replace(/\/+$/, '')}/${encodeURIComponent(shortId)}`
