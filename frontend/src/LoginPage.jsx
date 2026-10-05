@@ -1,39 +1,19 @@
-import { useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import SiteHeader from './SiteHeader.jsx'
 import { useAuth } from './useAuth.js'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
 function LoginPage() {
-  const { user, signIn } = useAuth()
+  const { user } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
-  const [error, setError] = useState('')
-  const [signingIn, setSigningIn] = useState(false)
-  const returnTo = new URLSearchParams(location.search).get('next')
+  const searchParams = new URLSearchParams(location.search)
+  const returnTo = searchParams.get('next')
   const destination = returnTo?.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/'
+  const error = searchParams.get('error')
 
   if (user) return <Navigate to={destination} replace />
-
-  async function handleCredential(response) {
-    if (!response.credential) {
-      setError('Google did not return a sign-in credential. Please try again.')
-      return
-    }
-
-    setSigningIn(true)
-    setError('')
-    try {
-      await signIn(response.credential)
-      navigate(destination, { replace: true })
-    } catch (signInError) {
-      setError(signInError.message)
-    } finally {
-      setSigningIn(false)
-    }
-  }
 
   return (
     <main className="page-shell">
@@ -45,14 +25,13 @@ function LoginPage() {
         <div className="login-card">
           {googleClientId
             ? <GoogleLogin
-              use_fedcm_for_button
-              onSuccess={handleCredential}
-              onError={() => setError('Google sign-in was cancelled or could not be completed.')}
+              ux_mode="redirect"
+              login_uri={`${window.location.origin}/api/auth/google/redirect`}
+              state={destination}
             />
             : <p className="form-error" role="alert">
               Google sign-in needs setup. Add <code>VITE_GOOGLE_CLIENT_ID</code> to the frontend environment and <code>GOOGLE_CLIENT_ID</code> to the backend environment.
             </p>}
-          {signingIn && <p className="login-message" role="status">Signing you in…</p>}
           {error && <p className="form-error login-message" role="alert">{error}</p>}
         </div>
         <Link className="login-back" to="/">Back to shortening links</Link>

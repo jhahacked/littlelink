@@ -10,6 +10,7 @@ import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 const app = express();
 app.disable("x-powered-by");
 app.use(cors);
+app.use(express.urlencoded({ extended: false, limit: "10kb" }));
 app.use(express.json());
 if (process.env.NODE_ENV === "production") {
     const frontendDistPath = fileURLToPath(
