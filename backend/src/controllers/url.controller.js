@@ -47,7 +47,7 @@ export const redirectToOriginalUrl = async (req, res) => {
     const shortUrl = await urlService.incrementClicksAndGetUrl(
         req.params.shortId
     );
-    return res.redirect(shortUrl.full_url);
+    return res.redirect(shortUrl.shortUrl.full_url);
 };
 
 export const deleteExpiredShortUrl = async (req, res) => {
